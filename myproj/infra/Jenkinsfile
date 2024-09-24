@@ -13,6 +13,7 @@ pipeline {
 		REGION = 'us-east-1'
 		AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
 			AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+		BRANCH_NAME = "${GIT_BRANCH.replaceFirst(/^.*\//, '')}"
 
 		//ENV_NAME = "${GLOBAL_ENV_NAME}"
 	}
@@ -26,8 +27,10 @@ pipeline {
 				sh " echo '---------------'"
 				sh " echo ${ENV_NAME}"
 				sh " echo ${GIT_BRANCH}"
-				ENV_NAME=${GIT_BRANCH}.split("/")[1]
+				sh " export ENV_NAME= echo ${GIT_BRANCH} | cut -d '/' -f1"
 				sh " echo ${ENV_NAME}"
+				sh " echo ${BRANCH_NAME}"				
+				
 				sh " echo '---------------'"				
 				sh " echo ENV ${ENV}"
 				sh " echo using ENV-inj  plugin i.e. outside the piple line script. ${ENV1}"
@@ -42,6 +45,7 @@ pipeline {
 				// to check if ENV name is global and passes through stages
 				sh " echo '---------------'"
 				sh "echo ENV_NAME ${ENV_NAME}"
+				sh " echo ${BRANCH_NAME}"					
 				sh " echo '---------------'"
 				
 				git branch: 'main', credentialsId: 'git-username-authcode', url: 'https://github.com/bmlearngit/Devops.git'
@@ -49,8 +53,9 @@ pipeline {
 		 }
 		stage('submit CF stack'){
 			steps{
-							sh " echo '---------------'"
+				sh " echo '---------------'"
 				sh "echo ENV_NAME ${ENV_NAME}"
+				sh " echo ${BRANCH_NAME}"	
 				sh " echo '---------------'"	
 			sh "( aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} ) || (aws cloudformation update-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION})"
 			}
