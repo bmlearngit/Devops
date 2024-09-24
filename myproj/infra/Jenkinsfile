@@ -22,6 +22,8 @@ pipeline {
 				//sh " echo ${BRANCH_NAME}"
 				sh " echo ENV ${ENV}"
 				sh " echo ENV-inj ${ENV1}"
+				sh " echo '---------------'"
+				sh 'printenv'
 			}
 		}
 		stage('git checkout'){
