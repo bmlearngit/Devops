@@ -6,7 +6,8 @@ agent any
 
 environment {
   PROJECT = 'myproj'
-	ENV = 'dev'
+	// ENV will be taken from jenkins job env injector
+	// ENV = 'dev'    
 	REGION = 'us-east-1'
 	AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
