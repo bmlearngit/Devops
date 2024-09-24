@@ -1,50 +1,46 @@
 
 pipeline {
 
-// agent { label '!windows' }
-agent any
+	// agent { label '!windows' }
+	agent any
 
-environment {
-  PROJECT = 'myproj'
-	// ENV will be taken from jenkins job env injector
-	// ENV = 'dev'    
-	REGION = 'us-east-1'
-	AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
-}
+	environment {
+	  PROJECT = 'myproj'
+		// ENV will be taken from jenkins job env injector
+		// ENV = 'dev'    
+		REGION = 'us-east-1'
+		AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
+			AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+	}
 
-// options cannot be empty 
-// options { }
+	// options cannot be empty 
+	// options { }
 
-stages{
-	stage('prep and checks'){
-		steps{
-
-			//sh " echo ${BRANCH_NAME}"
-			sh " echo ENV ${ENV}"
-			sh " echo ENV-inj ${ENV1}"
-			
-			
-			
+	stages{
+		stage('prep and checks'){
+			steps{
+				//sh " echo ${BRANCH_NAME}"
+				sh " echo ENV ${ENV}"
+				sh " echo ENV-inj ${ENV1}"
+			}
 		}
-
+		stage('git checkout'){
+			steps{
+				git branch: 'main', credentialsId: 'git-username-authcode', url: 'https://github.com/bmlearngit/Devops.git'
+					}
+		 }
+		stage('submit CF stack'){
+			steps{
+			sh "aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
+			}
+            		post {
+                		failure {
+				sh "aws cloudformation update-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
+                		}
+            		}
+			
+		}	
 		
 	}
-	
-	
-	stage('git checkout'){
-  	steps{
-	  	git branch: 'main', credentialsId: 'git-username-authcode', url: 'https://github.com/bmlearngit/Devops.git'
-			}
- 	 }
-	
-	stage('submit CF stack'){
-		steps{
-    	sh "aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
-	    }
-	}	
-	
-}
-
 
 }
