@@ -1,5 +1,5 @@
 // testing it outside as within environment string manupulation is not allowed
-GLOBAL_ENV_NAME=${GIT_BRANCH}.split("/")[1] 
+ENV_NAME='' 
 
 pipeline {
 
@@ -14,7 +14,7 @@ pipeline {
 		AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
 			AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
 
-		ENV_NAME = "${GLOBAL_ENV_NAME}"
+		//ENV_NAME = "${GLOBAL_ENV_NAME}"
 	}
 
 	// options cannot be empty 
@@ -23,9 +23,14 @@ pipeline {
 	stages{
 		stage('prep and checks'){
 			steps{
+				sh " echo '---------------'"
+				sh " echo ${ENV_NAME}"
 				sh " echo ${GIT_BRANCH}"
+				ENV_NAME=${GIT_BRANCH}.split("/")[1]
+				sh " echo ${ENV_NAME}"
+				sh " echo '---------------'"				
 				sh " echo ENV ${ENV}"
-				sh " echo ENV-inj ${ENV1}"
+				sh " echo using ENV-inj  plugin i.e. outside the piple line script. ${ENV1}"
 				sh " echo '---------------'"
 				sh "echo ENV_NAME ${ENV_NAME}"
 				sh " echo '---------------'"
@@ -34,11 +39,19 @@ pipeline {
 		}
 		stage('git checkout'){
 			steps{
+				// to check if ENV name is global and passes through stages
+				sh " echo '---------------'"
+				sh "echo ENV_NAME ${ENV_NAME}"
+				sh " echo '---------------'"
+				
 				git branch: 'main', credentialsId: 'git-username-authcode', url: 'https://github.com/bmlearngit/Devops.git'
 					}
 		 }
 		stage('submit CF stack'){
 			steps{
+							sh " echo '---------------'"
+				sh "echo ENV_NAME ${ENV_NAME}"
+				sh " echo '---------------'"	
 			sh "( aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} ) || (aws cloudformation update-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION})"
 			}
 
