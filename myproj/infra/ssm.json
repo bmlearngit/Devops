@@ -1,0 +1,70 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "VPC template",
+
+	"Parameters": {
+	
+		"ProjectName": {
+			"Type": "String",
+			"Description": "Specify the ProjectName",
+			"Default": "myproj1"
+		},	
+		
+		"EnvType": {
+			"Type": "String",
+			"Description": "Specify the EnvType",
+			"AllowedValues": ["dev", "qa"]
+		}
+	},
+	
+	
+	"Mappings": {
+	
+	
+		"EnvMappings" : {
+			
+
+							"dev": { 
+									"VPCCIDR": "10.10.0.0/16",
+									"S3BucketName": "dev-myproj1-buck"
+								},
+							"qa": { 
+									"VPCCIDR": "10.11.0.0/16",
+									"S3BucketName": "qa-myproj1-buck"
+								}
+
+
+			}
+
+		
+	},
+	
+"Resources": {
+
+
+	"BucketNameSSMParm": {
+	  "Type" : "AWS::SSM::Parameter",
+	  "Properties" : {
+		  "Tier" : "Standard",
+		  "Type" : "String",
+		  "Name" : "/myproj1/dev/S3BucketName",
+		  "Value" : { "Fn::FindInMap" : [ "EnvMappings" , {"Ref": "EnvType" }, "S3BucketName"] }
+		}
+	},
+
+	"VPCCIDRSSMParm": {
+	  "Type" : "AWS::SSM::Parameter",
+	  "Properties" : {
+		  "Tier" : "Standard",
+		  "Type" : "String",
+		  "Name" : "/myproj1/dev/VPCCIDR",
+		  "Value" : { "Fn::FindInMap" : [ "EnvMappings" , {"Ref": "EnvType" }, "VPCCIDR"] }
+		}
+	}	
+	
+	
+	
+	
+}
+
+}
