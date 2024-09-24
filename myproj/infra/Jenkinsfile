@@ -2,7 +2,6 @@
 pipeline {
 
 // agent { label '!windows' }
-
 agent any
 
 environment {
@@ -13,8 +12,8 @@ environment {
         AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
 }
 
-options {
-}
+// options cannot be empty 
+// options { }
 
 stages{
 	stage('git checkout'){
