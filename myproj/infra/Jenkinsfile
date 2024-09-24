@@ -1,1 +1,33 @@
 
+pipeline {
+
+// agent { label '!windows' }
+
+agent any
+
+environment {
+  PROJECT = 'myproj'
+	ENV = 'dev'
+	REGION = 'us-east-1'
+}
+
+options {
+}
+
+stages{
+	stage('git checkout'){
+  	steps{
+	  	git branch: 'main', credentialsId: 'git-username-authcode', url: 'https://github.com/bmlearngit/Devops.git'
+			}
+  }
+	
+	stage('submit CF stack'){
+		steps{
+    	sh "aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
+	    }
+	}	
+	
+}
+
+
+}
