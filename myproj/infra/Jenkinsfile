@@ -11,6 +11,8 @@ pipeline {
 		REGION = 'us-east-1'
 		AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
 			AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+
+		ENV_NAME=${GIT_BRANCH}".split("/")[1]
 	}
 
 	// options cannot be empty 
@@ -22,6 +24,8 @@ pipeline {
 				sh " echo ${GIT_BRANCH}"
 				sh " echo ENV ${ENV}"
 				sh " echo ENV-inj ${ENV1}"
+				sh " echo '---------------'"
+				sh "echo ENV_NAME ${ENV_NAME}"
 				sh " echo '---------------'"
 				sh 'printenv'
 			}
