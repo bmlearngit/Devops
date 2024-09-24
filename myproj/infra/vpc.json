@@ -9,7 +9,7 @@
 	"Parameters": {
 		
 		"VPCCIDR": {
-			"Type": "AWS::SSM::Parameter::ValueString<String>",
+			"Type": "AWS::SSM::Parameter::Value<String>",
 			"Description": "Taking the details from SSM ",
 			"Default": "/myproj1/dev/VPCCIDR"			
 		}
