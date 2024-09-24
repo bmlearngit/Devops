@@ -19,7 +19,7 @@ pipeline {
 	stages{
 		stage('prep and checks'){
 			steps{
-				//sh " echo ${BRANCH_NAME}"
+				sh " echo ${GIT_BRANCH}"
 				sh " echo ENV ${ENV}"
 				sh " echo ENV-inj ${ENV1}"
 				sh " echo '---------------'"
