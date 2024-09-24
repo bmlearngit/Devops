@@ -31,15 +31,11 @@ pipeline {
 		 }
 		stage('submit CF stack'){
 			steps{
-			sh "aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
+			sh "( aws cloudformation create-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} ) || (aws cloudformation update-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION})"
 			}
-            		post {
-                		failure {
-				sh "aws cloudformation update-stack --stack-name ${ENV}-${PROJECT}-vpc --template-body file://myproj/infra/vpc.json --tags Key=Env,Value=${ENV} --region ${REGION} "
-                		}
-            		}
+
 			
-		}	
+		}
 		
 	}
 
